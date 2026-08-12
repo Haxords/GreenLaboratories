@@ -1,33 +1,20 @@
 package com.greenlaboratories.fieldops
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
-            MaterialTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    ReportsScreen()
-                }
-            }
+        val textView = TextView(this).apply {
+            text = "Green Laboratories Field Ops"
+            textSize = 20f
         }
+        setContentView(textView)
     }
 }
 
-@Composable
 fun ReportsScreen(viewModel: Any? = null) {
-    Text(text = "Green Laboratories Field Ops")
+    // Empty placeholder
 }
-
