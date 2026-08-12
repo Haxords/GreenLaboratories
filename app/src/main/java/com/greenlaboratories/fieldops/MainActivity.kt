@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity() {
         btnAddParty?.setOnClickListener { showAddPartyDialog() }
         btnCollection?.setOnClickListener { showCollectionDialog() }
         btnHelp?.setOnClickListener {
-            Toast.makeText(this, "গ্রীন ল্যাবরেটরিজ হেল্পলাইন: ০৯৬১১০০০১১১", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "গ্রীন ল্যাবরেটরিজ হেল্পলাইন: 01306373232", Toast.LENGTH_LONG).show()
         }
 
         updateCashUI()
@@ -108,7 +108,7 @@ class MainActivity : AppCompatActivity() {
             }
         } else {
             // প্রথমবার ইনস্টল করলে ডিফল্ট ডাটা
-            partyList.add(Party(partyIdCounter++, "ডাক্তার কাজল রায় (Boro vita)", "01700000000", "রংপুর", 62600.0))
+            partyList.add(Party(partyIdCounter++, )
             saveDataToLocal()
         }
         renderPartyList()
