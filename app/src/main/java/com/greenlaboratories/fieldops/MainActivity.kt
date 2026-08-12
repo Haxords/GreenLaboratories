@@ -22,5 +22,5 @@ class MainActivity : AppCompatActivity() {
 }
 
 fun ReportsScreen(viewModel: Any? = null) {
-    // Left empty intentionally to prevent unresolved reference errors
+    // Empty placeholder
 }
