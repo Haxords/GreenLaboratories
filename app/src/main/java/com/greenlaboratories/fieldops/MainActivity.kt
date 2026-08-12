@@ -19,7 +19,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    AppNavigation()
+                    ReportsScreen()
                 }
             }
         }
@@ -27,11 +27,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun AppNavigation() {
-    ReportsScreen()
-}
-
-@Composable
 fun ReportsScreen(viewModel: Any? = null) {
     Text(text = "Green Laboratories Field Ops")
 }
+
