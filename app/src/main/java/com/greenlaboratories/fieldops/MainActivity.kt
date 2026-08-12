@@ -185,3 +185,7 @@ fun MainAppContent(viewModel: MainViewModel) {
         }
     }
 }
+@Composable
+fun ReportsScreen() {
+    androidx.compose.material3.Text(text = "Reports Screen")
+}
