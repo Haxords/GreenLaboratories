@@ -49,6 +49,7 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/tvTodaySales"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="৳ ০"
@@ -76,6 +77,7 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/tvCurrentCash"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="৳ ২০,৯১৬"
@@ -91,47 +93,59 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Action Options List -->
+    <!-- Action Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <Button
+            android:id="@+id/btnAddParty"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:backgroundTint="#2E7D32"
+            android:text="+ নতুন পার্টি যোগ করুন"
+            android:textColor="#FFFFFF" />
+
+        <Button
+            android:id="@+id/btnCollection"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:backgroundTint="#C62828"
+            android:text="৳ কালেকশন এন্ট্রি"
+            android:textColor="#FFFFFF" />
+    </LinearLayout>
+
+    <!-- Party List Header -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="4dp"
+        android:text="পার্টি তালিকা (Party List)"
+        android:textColor="#000000"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <!-- Party Scroll List -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
 
         <LinearLayout
+            android:id="@+id/partyContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="12dp">
-
-            <Button
-                android:id="@+id/btnSale"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:backgroundTint="#FFFFFF"
-                android:text="ক্যাশ বেচা                > "
-                android:textColor="#2E7D32"
-                android:textSize="16sp" />
-
-            <Button
-                android:id="@+id/btnPurchase"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:backgroundTint="#FFFFFF"
-                android:text="ক্যাশ কেনা                > "
-                android:textColor="#C62828"
-                android:textSize="16sp" />
-
-            <Button
-                android:id="@+id/btnExpense"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:backgroundTint="#FFFFFF"
-                android:text="খরচ                      > "
-                android:textColor="#C62828"
-                android:textSize="16sp" />
+            <!-- Dynamic Party Cards Will Appear Here -->
         </LinearLayout>
     </ScrollView>
 
