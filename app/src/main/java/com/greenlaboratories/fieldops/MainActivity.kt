@@ -1,17 +1,19 @@
 package com.greenlaboratories.fieldops
 
 import android.app.AlertDialog
+import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.text.InputType
 import android.view.Gravity
-import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import org.json.JSONArray
+import org.json.JSONObject
 
 data class Party(
     var id: Int,
@@ -44,23 +46,72 @@ class MainActivity : AppCompatActivity() {
         val btnCollection = findViewById<Button>(R.id.btnCollection)
         val btnHelp = findViewById<TextView>(R.id.btnHelp)
 
-        // Demo Initial Party
-        partyList.add(Party(partyIdCounter++, "ডাক্তার কাজল রায় (Boro vita)", "01700000000", "রংপুর", 62600.0))
-        renderPartyList()
+        // SharedPreferences থেকে পূর্বে সংরক্ষিত ডাটা লোড করা
+        loadDataFromLocal()
 
-        btnAddParty?.setOnClickListener {
-            showAddPartyDialog()
-        }
-
-        btnCollection?.setOnClickListener {
-            showCollectionDialog()
-        }
-
+        btnAddParty?.setOnClickListener { showAddPartyDialog() }
+        btnCollection?.setOnClickListener { showCollectionDialog() }
         btnHelp?.setOnClickListener {
             Toast.makeText(this, "গ্রীন ল্যাবরেটরিজ হেল্পলাইন: ০৯৬১১০০০১১১", Toast.LENGTH_LONG).show()
         }
 
         updateCashUI()
+    }
+
+    // --- SharedPreferences Data Save & Load Logic ---
+
+    private fun saveDataToLocal() {
+        val sharedPreferences = getSharedPreferences("FieldOpsData", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+
+        val jsonArray = JSONArray()
+        for (party in partyList) {
+            val jsonObject = JSONObject().apply {
+                put("id", party.id)
+                put("name", party.name)
+                put("phone", party.phone)
+                put("address", party.address)
+                put("dueAmount", party.dueAmount)
+            }
+            jsonArray.put(jsonObject)
+        }
+
+        editor.putString("party_list", jsonArray.toString())
+        editor.putFloat("today_sales", todaySales.toFloat())
+        editor.putFloat("current_cash", currentCash.toFloat())
+        editor.putInt("party_id_counter", partyIdCounter)
+        editor.apply()
+    }
+
+    private fun loadDataFromLocal() {
+        val sharedPreferences = getSharedPreferences("FieldOpsData", Context.MODE_PRIVATE)
+        val partyDataStr = sharedPreferences.getString("party_list", null)
+
+        todaySales = sharedPreferences.getFloat("today_sales", 0.0f).toDouble()
+        currentCash = sharedPreferences.getFloat("current_cash", 20916.0f).toDouble()
+        partyIdCounter = sharedPreferences.getInt("party_id_counter", 1)
+
+        partyList.clear()
+        if (!partyDataStr.isNullOrEmpty()) {
+            val jsonArray = JSONArray(partyDataStr)
+            for (i in 0 until jsonArray.length()) {
+                val obj = jsonArray.getJSONObject(i)
+                partyList.add(
+                    Party(
+                        id = obj.getInt("id"),
+                        name = obj.getString("name"),
+                        phone = obj.getString("phone"),
+                        address = obj.getString("address"),
+                        dueAmount = obj.getDouble("dueAmount")
+                    )
+                )
+            }
+        } else {
+            // প্রথমবার ইনস্টল করলে ডিফল্ট ডাটা
+            partyList.add(Party(partyIdCounter++, "ডাক্তার কাজল রায় (Boro vita)", "01700000000", "রংপুর", 62600.0))
+            saveDataToLocal()
+        }
+        renderPartyList()
     }
 
     private fun updateCashUI() {
@@ -112,6 +163,7 @@ class MainActivity : AppCompatActivity() {
                 setTextColor(Color.RED)
                 setOnClickListener {
                     partyList.remove(party)
+                    saveDataToLocal()
                     renderPartyList()
                     Toast.makeText(this@MainActivity, "পার্টি ডিলিট করা হয়েছে", Toast.LENGTH_SHORT).show()
                 }
@@ -159,10 +211,9 @@ class MainActivity : AppCompatActivity() {
 
             if (name.isNotEmpty()) {
                 partyList.add(Party(partyIdCounter++, name, phone, address))
+                saveDataToLocal()
                 renderPartyList()
-                Toast.makeText(this, "নতুন পার্টি সফলভাবে যোগ হয়েছে", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, "পার্টির নাম লিখুন!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "নতুন পার্টি যোগ করা হয়েছে", Toast.LENGTH_SHORT).show()
             }
         }
         builder.setNegativeButton("বাতিল", null)
@@ -191,8 +242,9 @@ class MainActivity : AppCompatActivity() {
             party.name = etName.text.toString()
             party.phone = etPhone.text.toString()
             party.address = etAddress.text.toString()
+            saveDataToLocal()
             renderPartyList()
-            Toast.makeText(this, "পার্টির তথ্য আপডেট করা হয়েছে", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "তথ্য আপডেট করা হয়েছে", Toast.LENGTH_SHORT).show()
         }
         builder.setNegativeButton("বাতিল", null)
         builder.show()
@@ -203,7 +255,7 @@ class MainActivity : AppCompatActivity() {
         builder.setTitle("${party.name}-কে প্রডাক্ট দিন")
 
         val etAmount = EditText(this).apply {
-            hint = "প্রডাক্ট এর মোট টাকা (টাকা)"
+            hint = "প্রডাক্ট এর মোট টাকা"
             inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
         }
         builder.setView(etAmount)
@@ -212,6 +264,7 @@ class MainActivity : AppCompatActivity() {
             val amount = etAmount.text.toString().toDoubleOrNull() ?: 0.0
             if (amount > 0) {
                 party.dueAmount += amount
+                saveDataToLocal()
                 renderPartyList()
                 Toast.makeText(this, "প্রডাক্ট বাকি হিসেবে যুক্ত হয়েছে", Toast.LENGTH_SHORT).show()
             }
@@ -232,9 +285,7 @@ class MainActivity : AppCompatActivity() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("টাকা কালেকশন করুন")
 
-        builder.setSingleChoiceItems(partyNames, 0) { _, which ->
-            selectedPartyIndex = which
-        }
+        builder.setSingleChoiceItems(partyNames, 0) { _, which -> selectedPartyIndex = which }
 
         val etAmount = EditText(this).apply {
             hint = "কালেকশন এর পরিমাণ (টাকা)"
@@ -255,14 +306,14 @@ class MainActivity : AppCompatActivity() {
                 selectedParty.dueAmount -= amount
                 if (selectedParty.dueAmount < 0) selectedParty.dueAmount = 0.0
 
-                // কালেকশন এর টাকা আজ বেচা এবং ক্যাশে যোগ করা
                 todaySales += amount
                 currentCash += amount
 
+                saveDataToLocal()
                 updateCashUI()
                 renderPartyList()
 
-                Toast.makeText(this, "৳$amount কালেকশন সফল হয়েছে এবং ক্যাশে যোগ হয়েছে!", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "৳$amount কালেকশন সফল হয়েছে!", Toast.LENGTH_LONG).show()
             }
         }
         builder.setNegativeButton("বাতিল", null)
@@ -270,6 +321,4 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
-fun ReportsScreen(viewModel: Any? = null) {
-    // Empty placeholder
-}
+fun ReportsScreen(viewModel: Any? = null) {}
